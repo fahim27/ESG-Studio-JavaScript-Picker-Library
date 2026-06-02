@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESG Studio Picker</title>
+    <link rel="stylesheet" href="esg-studio.css">
+</head>
+
+<body>
+
+
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; z-index: 5;">
+        <!-- Selection Showcase -->
+        <div id="selectionShowcase"
+            style="min-height: 120px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+            <p style="color: var(--tg-text-muted); font-size: 14px; font-style: italic;">Select something from the
+                picker to see it here</p>
+        </div>
+
+        <!-- Chat Composer Box -->
+        <div
+            style="display: flex; align-items: center; background: var(--tg-bg); border: 1px solid var(--tg-border); padding: 8px 16px; border-radius: 30px; width: 450px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); transition: all 0.3s;">
+            <input type="text" id="messageInput" placeholder="Write a message..."
+                style="flex-grow: 1; background: transparent; border: none; outline: none; color: var(--tg-text); font-size: 15px; padding: 6px 0;">
+            <button id="togglePickerBtn"
+                style="background: none; border: none; color: #3390ec; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 50%; transition: all 0.2s; margin-left: 8px;"
+                title="Toggle Picker">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                    <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                    <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="esg-studio.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageInput = document.getElementById('messageInput');
+            const selectionShowcase = document.getElementById('selectionShowcase');
+
+            // Initialize the ESGStudio Library simply inside the click event
+            document.getElementById('togglePickerBtn').addEventListener('click', function () {
+                const picker = new ESGStudio({
+                    onSelect: (type, data) => {
+                        console.log('Selected:', type, data);
+
+                        if (type === 'emoji') {
+                            // Append emoji to text input
+                            messageInput.value += data;
+                            messageInput.focus();
+                            picker.hide();
+                        } else if (type === 'sticker') {
+                            // Showcase the sticker
+                            selectionShowcase.innerHTML = `<img src="${data}" alt="Selected Sticker" style="max-height: 120px; object-fit: contain; animation: popIn 0.3s ease;">`;
+                            picker.hide();
+                        } else if (type === 'gif') {
+                            // Showcase the GIF
+                            selectionShowcase.innerHTML = `<img src="${data}" alt="Selected GIF" style="max-height: 120px; border-radius: 8px; object-fit: contain; animation: popIn 0.3s ease;">`;
+                            picker.hide();
+                        } else if (type === 'backspace') {
+                            // Handle backspace
+                            const str = messageInput.value;
+                            if (str.length > 0) {
+                                const charArray = Array.from(str);
+                                charArray.pop();
+                                messageInput.value = charArray.join('');
+                            }
+                            messageInput.focus();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
